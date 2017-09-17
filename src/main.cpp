@@ -147,7 +147,7 @@ int main() {
           double pred_x = get<0>(new_car_coordinates);
           double pred_y = get<1>(new_car_coordinates);
           
-          const double pred_cte = polyeval(coeffs, pred_x);
+          const double pred_cte = abs(pred_y - polyeval(coeffs, pred_x));
           const double pred_epsi = pred_psi - atan(coeffs[1] + 2 * pred_x * coeffs[2] + 3 * coeffs[3] * pow(pred_x, 2));
           
           Eigen::VectorXd state(6);
