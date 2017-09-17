@@ -7,7 +7,7 @@ Self-Driving Car Engineer Nanodegree Program
 
 * cmake >= 3.5
  * All OSes: [click here for installation instructions](https://cmake.org/install/)
-* make >= 4.1
+* make >= 4.1(mac, linux), 3.81(Windows)
   * Linux: make is installed by default on most Linux distros
   * Mac: [install Xcode command line tools to get make](https://developer.apple.com/xcode/features/)
   * Windows: [Click here for installation instructions](http://gnuwin32.sourceforge.net/packages/make.htm)
@@ -28,6 +28,7 @@ Self-Driving Car Engineer Nanodegree Program
   * Mac: `brew install gcc` (might not be required)
   * Linux: `sudo apt-get install gfortran`. Additionall you have also have to install gcc and g++, `sudo apt-get install gcc g++`. Look in [this Dockerfile](https://github.com/udacity/CarND-MPC-Quizzes/blob/master/Dockerfile) for more info.
 * [Ipopt](https://projects.coin-or.org/Ipopt)
+  * If challenges to installation are encountered (install script fails).  Please review this thread for tips on installing Ipopt.
   * Mac: `brew install ipopt`
        +  Some Mac users have experienced the following error:
        ```
@@ -124,3 +125,7 @@ that's just a guess.
 
 One last note here: regardless of the IDE used, every submitted project must
 still be compilable with cmake and make./
+
+## How to write a README
+A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
+
