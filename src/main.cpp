@@ -75,7 +75,10 @@ tuple<double, double> transform_to_car_coordinates(double point_in_global_x, dou
   double final_x = (shift_x * cos(-car_psi) - shift_y * sin(-car_psi));
   double final_y = (shift_x * sin(-car_psi) + shift_y * cos(-car_psi));
   
-  return {final_x, final_y};
+  //This might be what caused reviewer to not be able to run make
+  //return {final_x, final_y}; 
+  //http://en.cppreference.com/w/cpp/utility/tuple
+  return std::make_tuple(final_x, final_y);
 }
 
 int main() {
