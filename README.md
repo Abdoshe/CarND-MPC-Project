@@ -29,41 +29,21 @@ The goal of the model was to optimize the following actuators to best fit the wa
 
 In order to properly handle the 100ms, I couldn't use the current state of the vehicle, as the actuators would change by the time it should already be at the next step, considering the 100ms step interval. In order to properly handle the car, I had to estimate the state 100ms in the future. Here's how I estimated:
 
-First step was to predict the velocity, as the rest of the state values would depend on it:
 
 ```
-Predicted_Velocity = Velocity + (Throttle * Latency)
-```
+Lf = 2.67 # Length from front to CoG
+v[t+1] = v[t] + Throttle * Latency
+psi[t+1] = Latency * v[t] * Steering_Rate / Lf
 
-After that, I had to predict the angle the car would be, which would dependon the rate at which the car was turning:
-
-```
-Predicted_Angle = Predicted_Velocity * Latency * Steering_Rate / 2
-```
-The division by 2 was to average the rate of change, as the Steering_Rate would have changed over time during the 100ms interval.
-
-Using the estimated velocity and angle, estimate the x and y position:
-
-```
 # How much the car moved in the x and y axis
-X_Displacement = Predicted_Velocity * Latency * cos(Predicted_Angle)
-Y_Displacement = Predicted_Velocity * Latency * sin(Predicted_Angle)
+x[t+1] = v[t] * Latency * cos(Psi[t+1])
+t[t+1] = v[t] * Latency * sin(Psi[t+1])
 
-# Estimate in the track global position
-Global_X = Previous_X + X_Displacement * cos(Predicted_Angle) - sin(Predicted_Angle)
-Global_Y = Previous_X + X_Displacement * sin(Predicted_Angle) + cos(Predicted_Angle)
+cte[t+1] = abs(y[t+1] - f(x[t+1]))
+epsi[t+1] = psi[t+1] - atan(coefficient[1] + 2 * x[t+1] * coefficient[2] + 3 * coefficient[3] * x[t+1]^2);
 ```
+where f() is the fitted polynomial and coefficient[n] is the coefficient of the polynomial at the order n.
 
-Transforming the Global_X and Global_Y into the car coodinate space would give an x,y coordinate value in the fitted polynomial that would represent the estimated position of the car 100ms in the future.
-
-By assuming that our polynomial is fitted to the center of the track, we can also estimate the cross track error by evaluating the x position of the vehicle and getting the expected y along the polynomial, and substracting the estimated y position. That is not the true cross track error, but works well enough for the problem.
-
-The angle error can be estimated with the following formula:
-
-```
-Predicted_Angle_error = Predicted_Angle - atan(coeffs[1] + 2 * Predicted_X * coeffs[2] + 3 * coeffs[3] * pow(Predicted_X, 2))
-```
-where coeffs is the vector of coefficients of the fitted polynomial.
 
 
 ### Number of Steps and Steps Interval

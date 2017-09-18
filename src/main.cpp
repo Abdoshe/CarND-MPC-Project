@@ -131,27 +131,16 @@ int main() {
           auto coeffs = polyfit(ptsx_transform, ptsy_transform, 3);
           
           double latency = 0.1;
+                    
+          //Predict steer rate and psi after latency        
+          double steer_rate = steer / Lf;
           
-          //Predict steer rate and psi after latency
-          double pred_v = v + throttle * latency;
-          double steer_rate = steer * (deg2rad(25));
-          double pred_psi = -pred_v * latency * steer_rate / 2;
-          
-          double displacement_x = pred_v * latency * cos(pred_psi);
-          double displacement_y = pred_v * latency * sin(pred_psi);
-          
-          cout << displacement_x << ", " << displacement_y << endl;
-          
-          double pred_global_psi = psi + pred_psi;
-          double pred_global_x = px + displacement_x * cos(pred_global_psi) - displacement_y * sin(pred_global_psi);
-          double pred_global_y = py + displacement_x * sin(pred_global_psi) + displacement_y * cos(pred_global_psi);
-          
-          tuple<double, double> new_car_coordinates = transform_to_car_coordinates(pred_global_x, pred_global_y, px, py, psi);
-          double pred_x = get<0>(new_car_coordinates);
-          double pred_y = get<1>(new_car_coordinates);
-          
-          const double pred_cte = abs(pred_y - polyeval(coeffs, pred_x));
-          const double pred_epsi = pred_psi - atan(coeffs[1] + 2 * pred_x * coeffs[2] + 3 * coeffs[3] * pow(pred_x, 2));
+          double pred_psi = -v * latency * steer_rate;                 
+          double pred_x = v * latency * cos(-pred_psi);
+          double pred_y = v * latency * sin(-pred_psi);        
+          double pred_v = v + throttle * latency;               
+          double pred_cte = abs(pred_y - polyeval(coeffs, pred_x));
+          double pred_epsi = pred_psi - atan(coeffs[1] + 2 * pred_x * coeffs[2] + 3 * coeffs[3] * pow(pred_x, 2));
           
           Eigen::VectorXd state(6);
           state << pred_x, pred_y, pred_psi, pred_v, pred_cte, pred_epsi;
@@ -163,7 +152,7 @@ int main() {
 
           //Display the MPC predicted trajectory 
           vector<double> predicted_x_vals;
-          vector<double> predicted_y_vals;
+          vector<double> predicted_y_vals;    
 
           for (int i = 2; i < pred_result.size(); i++) {
             if (i % 2 == 0) {
@@ -183,11 +172,11 @@ int main() {
           const double number_of_steps = 20;
           for (int i = 1; i < number_of_steps; i++) {
             const double step = steps_inc * i;
-            waypoints_x_vals.push_back(step + displacement_x);
-            waypoints_y_vals.push_back(polyeval(coeffs, step) + displacement_y);
+            waypoints_x_vals.push_back(step + pred_x);
+            waypoints_y_vals.push_back(polyeval(coeffs, step) + pred_y);
           }
 
-          double steering_angle = pred_result[0] / (deg2rad(25 * Lf));
+          double steering_angle = pred_result[0] / (deg2rad(25) * Lf);          
           msgJson["steering_angle"] = steering_angle;
           msgJson["throttle"] = pred_result[1];
 
